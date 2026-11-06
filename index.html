@@ -8,36 +8,54 @@
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" href="./icons/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="./icons/icon-192.png">
-  <link rel="stylesheet" href="./style.css">
+  <link rel="stylesheet" href="./style.css?v=2">
   <title>ことばポケット | 多言語翻訳</title>
-  <script src="./script.js" defer></script>
+  <script src="./model-registry.js?v=2" defer></script>
+  <script src="./script.js?v=2" defer></script>
 </head>
 <body>
-  <header class="site-header"><a class="brand" href="./"><span class="brand-icon" aria-hidden="true">文</span><span>ことばポケット<small>あなたの言葉を、もっと遠くへ。</small></span></a><button id="theme-toggle" class="icon-button" aria-label="配色を変更">◐</button></header>
+  <header class="site-header"><a class="brand" href="./"><span class="brand-icon" aria-hidden="true">文</span><span>ことばポケット</span></a><button id="theme-toggle" class="icon-button" aria-label="配色を変更">◐</button></header>
   <main>
-    <section class="intro"><div class="eyebrow">YOUR EVERYDAY LANGUAGE COMPANION</div><h1>世界の言葉を、<br class="mobile-break">あなたの言葉に。</h1><p>コピーして、訳して、また使う。シンプルな翻訳ノート。</p></section>
+    <h1 class="sr-only">ことばポケット 翻訳</h1>
     <nav class="tabs" aria-label="メインメニュー">
       <button class="tab active" data-page="translate" aria-current="page">↔ <span>テキスト</span></button>
       <button class="tab" data-page="images">▧ <span>画像</span></button>
       <button class="tab" data-page="history">◷ <span>履歴</span></button>
       <button class="tab" data-page="models">✧ <span>モデル</span></button>
+      <button class="tab" data-page="services">↗ <span>サービス</span></button>
     </nav>
     <section id="page-translate" class="page" aria-label="テキスト翻訳">
-      <div class="toolbar"><div><span class="dot"></span><span id="active-model">Chrome Translator</span><span class="badge">無料・端末内</span></div><button id="open-settings" class="text-button">言語設定 ⚙</button></div>
-      <div id="capability" class="notice" role="status">ブラウザの翻訳機能を確認しています…</div>
+      <div class="toolbar"><span class="muted">テキスト翻訳</span><button id="open-settings" class="text-button">設定・言語 ⚙</button></div>
       <div class="editors">
         <section class="editor"><div class="editor-heading"><label for="source-text">原文 <span id="source-label">自動判定</span></label><button id="paste" class="text-button">貼り付け</button></div><textarea id="source-text" maxlength="5000" placeholder="翻訳したい文章を入力してください。" spellcheck="false"></textarea><div class="editor-footer"><span id="char-count">0 / 5,000</span><button id="clear-text" class="text-button">クリア</button></div></section>
-        <section class="editor result-editor"><div class="editor-heading"><h2>翻訳結果 <span id="target-label">日本語</span></h2><button id="copy" class="text-button" disabled>コピー</button></div><div id="result" class="result" aria-live="polite"><span class="placeholder">ここに翻訳結果が表示されます。</span></div><div class="editor-footer"><span id="result-note">対応ブラウザで翻訳できます</span><span aria-hidden="true">✧</span></div></section>
       </div>
-      <div class="action-row"><p>入力した文章を外部の翻訳サービスへ送信しません。</p><button id="translate" class="primary">翻訳する <span aria-hidden="true">↗</span></button></div>
+      <div class="translation-controls">
+        <label for="translation-model">翻訳モデル<select id="translation-model"></select></label>
+        <label for="reasoning-level">思考量<select id="reasoning-level"></select></label>
+        <button id="translate" class="primary">翻訳する ↗</button>
+      </div>
+      <p id="reasoning-note" class="muted">Chrome Translator は思考量を調整できません。「自動」のみ使用します。</p>
+      <div id="capability" class="notice" role="status">ブラウザの翻訳機能を確認しています…</div>
+      <p class="muted privacy-line">入力文を外部の翻訳サービスへ送信しません。</p>
+        <section class="editor result-editor"><div class="editor-heading"><h2>翻訳結果 <span id="target-label">日本語</span></h2><button id="copy" class="text-button" disabled>コピー</button></div><div id="result" class="result" aria-live="polite"><span class="placeholder">ここに翻訳結果が表示されます。</span></div><div class="editor-footer"><span id="result-note">対応ブラウザで翻訳できます</span><span aria-hidden="true">✧</span></div></section>
       <div class="privacy-card"><label class="check"><input type="checkbox" id="save-history">翻訳履歴をこの端末に保存する</label><p>初期設定はオフ。オンの場合も、保存するのは翻訳に成功した文章だけです。個人情報・秘密情報を含む文章は入力しないでください。共有端末では保存をオフにしてください。</p><p id="storage-note">履歴はブラウザ内の IndexedDB に保存されます。クラウド同期はありません。</p></div>
     </section>
-    <section id="page-images" class="page" aria-label="画像翻訳" hidden><div class="section-heading"><div><div class="eyebrow">IMAGE TRANSLATION</div><h2>写真から、言葉をひらく。</h2></div><span class="badge">準備中</span></div><div class="notice">このバージョンは画像の選択・プレビューのみ対応しています。OCR（文字の読み取り）と画像翻訳は未実装です。</div><label class="upload" for="image-file" tabindex="0" role="button" id="choose-image"><span aria-hidden="true">▧</span><strong>画像を選択</strong><span>写真ライブラリやカメラから · JPEG / PNG / WebP · 最大10MB</span></label><input type="file" id="image-file" accept="image/jpeg,image/png,image/webp" hidden><div id="image-preview" hidden><img id="preview" alt="選択した画像のプレビュー"><p id="image-name"></p><button class="secondary" id="remove-image">画像を取り除く</button></div><p class="muted">画像はアップロード・保存されません。将来、端末内OCRを追加できる構成です。</p></section>
+    <section id="page-images" class="page" aria-label="画像翻訳" hidden><div class="section-heading"><div><div class="eyebrow">IMAGE TRANSLATION</div><h2>写真から、言葉をひらく。</h2></div><span class="badge">準備中</span></div><div class="notice">このバージョンは画像の選択・プレビューのみ対応しています。OCR（文字の読み取り）と画像翻訳は未実装です。画像の外部送信や料金が発生する処理は行いません。</div><fieldset class="image-modes"><legend>将来の画像翻訳モード</legend><div id="image-modes"></div></fieldset><label class="upload" for="image-file" tabindex="0" role="button" id="choose-image"><span aria-hidden="true">▧</span><strong>画像を選択</strong><span>写真ライブラリやカメラから · JPEG / PNG / WebP · 最大10MB</span></label><input type="file" id="image-file" accept="image/jpeg,image/png,image/webp" hidden><div id="image-preview" hidden><img id="preview" alt="選択した画像のプレビュー"><p id="image-name"></p><button class="secondary" id="remove-image">画像を取り除く</button></div><p class="muted">画像はアップロード・保存されません。将来、端末内OCRを追加できる構成です。</p></section>
     <section id="page-history" class="page" aria-label="翻訳履歴" hidden><div class="section-heading"><div><div class="eyebrow">YOUR WORD COLLECTION</div><h2>もう一度、使いたい言葉。</h2></div><button id="delete-all" class="text-button danger">すべて削除</button></div><label class="sr-only" for="history-search">履歴を検索</label><input id="history-search" type="search" placeholder="原文・翻訳文から検索" class="search"><div id="history-list"></div><p class="muted">端末のサイトデータを削除すると履歴も消えます。自動バックアップはありません。</p></section>
-    <section id="page-models" class="page" aria-label="翻訳モデル" hidden><div class="section-heading"><div><div class="eyebrow">TRANSLATION ENGINE</div><h2>言葉をつなぐエンジン。</h2></div></div><p class="muted">現在使用できるエンジンは Chrome Translator のみです。お気に入りとピン留めはこの端末に保存します。</p><div id="model-list"></div><div class="notice">APIキー・外部アカウント・有料サービスは不要です。将来のモデルは、導入するまで翻訳には使用できません。</div></section>
+    <section id="page-models" class="page" aria-label="翻訳モデル" hidden><div class="section-heading"><div><div class="eyebrow">TRANSLATION ENGINE</div><h2>言葉をつなぐエンジン。</h2></div></div><p class="muted">現在のエンジンは Chrome Translator のみです。候補名は公式APIの提供やモデルIDを保証しません。未接続の候補は翻訳に使用できません。</p>
+      <div class="model-filters"><label for="model-search">モデル検索<input id="model-search" class="search" type="search" placeholder="名前・提供元で検索"></label><label for="model-sort">並べ替え<select id="model-sort"><option value="recommended">ピン・お気に入り優先</option><option value="name">名前順</option><option value="custom">自分の順番</option></select></label></div>
+      <div id="model-list"></div><div class="notice">APIキー・外部アカウント・有料サービスは不要です。将来のモデルは、導入するまで翻訳には使用できません。</div></section>
+    <section id="page-services" class="page" aria-label="公式サービスの案内" hidden>
+      <h2>公式サービスの案内</h2>
+      <div class="notice">公式Webサイトへのログインと、APIの利用契約・料金は別です。サイトを開いても、このアプリには接続されません。現時点で有料APIには接続しません。</div>
+      <p>サービスはそれぞれの公式サイトを別タブで開きます。このアプリはログイン情報・パスワード・セッションクッキーを取得・保存せず、他サービスを自動操作しません。原文も自動では渡しません。</p>
+      <p>各サービスの年齢条件、保護者の同意条件、学校の利用規則を確認してください。条件を満たさないサービスは利用しないでください。登録や契約はこのアプリの利用に必要ありません。</p>
+      <div class="service-links"><a href="https://chatgpt.com/" target="_blank" rel="noopener noreferrer">ChatGPT 公式 ↗</a><a href="https://gemini.google.com/" target="_blank" rel="noopener noreferrer">Gemini 公式 ↗</a><a href="https://claude.ai/" target="_blank" rel="noopener noreferrer">Claude 公式 ↗</a><a href="https://qwen.ai/" target="_blank" rel="noopener noreferrer">Qwen 公式案内 ↗</a></div>
+      <h3>将来の正式API連携</h3><p class="muted">未接続です。公式のモデル一覧・認証方法・年齢条件・料金を確認し、静的サイトへ秘密情報を置かない構成を準備してから検討します。Web版の契約でAPIも使えるとは限りません。</p>
+    </section>
     <footer><span>ことばポケット</span><span>シンプルに。あなたの端末で。</span></footer>
   </main>
-  <dialog id="settings"><form method="dialog"><div class="section-heading"><h2>言語設定</h2><button class="icon-button" aria-label="設定を閉じる">×</button></div><label for="source-language">原文の言語</label><select id="source-language"></select><p class="muted">自動判定には Language Detector API も必要です。未対応の場合は言語を手動で選んでください。</p><label for="foreign-language">日本語から翻訳する言語</label><select id="foreign-language"></select><div class="notice">外国語 → 日本語<br>日本語 → 選択した外国語</div><button class="primary full" value="save">設定を閉じる</button></form></dialog>
+  <dialog id="settings"><form method="dialog"><div class="section-heading"><h2>設定・言語</h2><button class="icon-button" aria-label="設定を閉じる">×</button></div><label class="check"><input type="checkbox" id="auto-translate-paste">貼り付け後に自動翻訳する</label><p class="muted">初期設定はオフ。翻訳機能が利用可能な場合のみ実行します。iPhone Safariの貼り付け確認はブラウザの仕様です。「ペースト」の許可が必要な場合があります。</p><label for="settings-reasoning">思考量</label><select id="settings-reasoning"></select><p class="muted">モデルごとに対応する設定のみ選択できます。現在のChrome Translatorは「自動」のみで、思考量を変更しません。</p><label for="source-language">原文の言語</label><select id="source-language"></select><p class="muted">自動判定には Language Detector API も必要です。未対応の場合は言語を手動で選んでください。</p><label for="foreign-language">日本語から翻訳する言語</label><select id="foreign-language"></select><div class="notice">外国語 → 日本語<br>日本語 → 選択した外国語</div><button class="primary full" value="save">設定を閉じる</button></form></dialog>
   <div id="toast" role="status" class="toast" hidden></div>
 </body>
 </html>

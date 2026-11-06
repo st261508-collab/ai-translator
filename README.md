@@ -2,6 +2,36 @@
 
 iPhone・Chromebook向けの、日本語で使える多言語翻訳サイトです。HTML・CSS・JavaScriptのみで動き、GitHub Pagesで無料公開できます。ビルド、APIキー、有料API、外部AIサービスのアカウント登録は不要です。
 
+## 今回の改良
+
+大きな紹介エリアを削除し、原文・貼り付け → 翻訳モデル・思考量 → 翻訳実行 → 結果の順番にしました。iPhone幅320〜430pxで横にはみ出さないようにしています。
+
+- 「設定・言語」で「貼り付け後に自動翻訳する」を設定できます。初期値はオフです。Safariの追加確認は回避しません。許可拒否・空のクリップボード・許可待ちの間に文章を編集した場合は、入力をそのまま残します。
+- 自動翻訳はローカルエンジンと必要なモデルが利用可能な場合のみ実行します。未対応時は貼り付けだけ行い、モデル取得が必要な場合は手動の「翻訳する」を案内します。
+- モデル画面に検索、ピン・お気に入り優先／名前順／自分の順番を追加しました。「自分の順番」を選び、検索を空にすると「上へ」「下へ」で移動できます。
+- GPT-6ファミリー（Astra / Sol / Terra / Luna）、Gemini 3.5 Flash-Lite、Claude Sonnet 5.5、Claude Haiku 5.5、Qwen 3.8 Maxを**依頼された候補名**として登録しています。公式の提供状況・正式モデルIDは未確認です。すべて「未接続」で実行・課金されません。
+- 思考量は「自動・低・標準・高・最大」を表示します。現在のChrome Translatorには調整機能がなく、「自動」以外は選べません。AIの思考量を設定できたという意味ではありません。
+- 「サービス」は公式サイトを別タブで開く案内だけです。WebログインとAPI契約は別で、このサイトとの自動連携はありません。外部ログイン情報やセッションクッキーを扱いません。年齢条件・保護者の同意条件・学校の利用規則を満たさないサービスは利用しないでください。
+- 画像モードAは無料OCR・翻訳文の重ね表示用、BはGPT-Image / Nano Bananaの正式API用の将来枠です。Aは未実装、Bは「未接続・利用条件の確認が必要」。どちらも実行できません。
+- 履歴のIndexedDB名 `kotoba-pocket`、バージョン1、`history`ストア、レコード形式は維持しています。既存の言語・履歴設定・お気に入りも維持します。
+
+### 公開中のサイトを更新する手順（Chromebook）
+
+1. 今回案内するPull Request（PR）を開きます。作成画面のURLの場合は、`base: main`、`compare: feat/compact-model-workspace`を確認し、「Create pull request」を押します。
+2. PRの「Files changed」で変更を確認します。mainへ直接Pushしていないので、この段階では公開サイトは変わりません。
+3. 内容に問題がなければPRの「Conversation」に戻り、「Merge pull request」→「Confirm merge」を押します。**この操作で初めてmainに変更が入ります。**
+4. リポジトリの「Actions」で既存のPages公開処理が完了するまで待ちます。Pages設定をやり直す必要はありません。
+5. 公開サイトをオンラインで開きます。以前から開いていたサイトのタブとホーム画面アプリをすべて閉じ、もう一度開いてください。更新の取得と旧タブの終了で新しいPWAに切り替わります。古い画面ならオンラインで開き直し、再度すべて閉じてから開きます。
+6. 入力欄、貼り付け、設定、モデル、既存履歴を確認します。**更新のためにサイトデータを削除しないでください。履歴も消えてしまいます。**
+
+### 拡張用のモデル情報
+
+`model-registry.js` の `id` は画面内部の識別子です。公式APIに送るIDではありません。候補の `apiModelId` は未確認のため `null` にしています。
+
+将来、正式な認証を備えたサーバー側アダプターが公式モデル一覧を取得し、`withProviderMetadata(provider, records)` に `[{candidateKey, id, displayName, reasoningMap}]` を渡す構成です。`id` は公式レスポンスの値をそのまま使い、`reasoningMap` は公式仕様で確認した対応レベルと値だけを渡します。この関数はネットワーク処理を行わず、情報を受け取るだけです。メタデータを追加しても `connected` はfalseのままで、実行可能にはなりません。正式アダプター・認証・利用条件・同意の準備が別途必要です。現在はモデル一覧の外部取得もAPI接続も実行しません。
+
+画像は別の `imageModes` 定義を持ち、Aは文字の座標検出→翻訳→重ね描画、Bは正式APIアダプターで画像編集という別パイプラインを想定しています。現在の画像プレビューからパイプラインを呼び出す処理はありません。
+
 ## できること・できないこと
 
 - テキストの入力・貼り付け、翻訳結果のコピー。クリップボードが使えない場合は、長押しや通常のコピー・貼り付けを使います。
@@ -30,7 +60,7 @@ APIの有無と `Translator.availability()` を実行時に確認します。自
 
 1. 作業ファイル一式をダウンロードします（利用中の画面にダウンロード機能がある場合）。
 2. GitHubの `st261508-collab/ai-translator` を開きます。
-3. 「Add file」→「Upload files」で、`index.html`、`style.css`、`script.js`、`sw.js`、`manifest.webmanifest`、`icons`フォルダ、`tests`フォルダ、`README.md`をアップロードします。ZIPをそのまま置かず、解凍した中身を置きます。
+3. 「Add file」→「Upload files」で、`index.html`、`style.css`、`script.js`、`model-registry.js`、`sw.js`、`manifest.webmanifest`、`icons`フォルダ、`tests`フォルダ、`README.md`をアップロードします。ZIPをそのまま置かず、解凍した中身を置きます。
 4. 「Commit changes」で保存します。ブランチを作った場合はPRを作り、内容を確認して `main` にマージします。
 5. リポジトリの一番上の階層に `index.html` と `icons` フォルダがあることを確認します。
 6. リポジトリの「Settings」→「Pages」を開きます。設定を変更できる管理権限が必要です。
@@ -65,6 +95,7 @@ APIの有無と `Translator.availability()` を実行時に確認します。自
 
 - `index.html`：日本語の画面、ダイアログ
 - `style.css`：スマートフォン対応・ダークモード
+- `model-registry.js`：未接続候補、公式モデル情報の受け取り口、思考量と画像モードの定義
 - `script.js`：翻訳アダプター `engines`、言語判定、IndexedDB、モデル設定、画像プレビュー
 - `manifest.webmanifest` / `sw.js` / `icons/`：PWA、画面キャッシュ、アイコン
 - `tests/browser.cjs`：ブラウザ統合テスト
@@ -73,7 +104,7 @@ APIの有無と `Translator.availability()` を実行時に確認します。自
 
 将来のTransformers.js導入は、ライセンス・配布元・モデル容量・メモリ・iPhoneでの速度を検証して `engines` にアダプターを追加します。OCRは画像のプレビュー処理と分けて追加します。複数AIの正規APIを追加する場合は、キーを静的ファイルやGitHubへ置かず、別途適切な認証・サーバー構成を検討する必要があります。今の版では接続しません。
 
-画面ファイルを更新するときは `sw.js` の `CACHE` のバージョンも上げてください。新しいキャッシュは、更新取得後に古いタブをすべて閉じ、開き直すと有効になります。
+画面ファイルを更新するときは `sw.js` の `CACHE` のバージョンと、HTML・SHELL内のCSS/JSの `?v=` も一緒に上げてください。今回のキャッシュは `kotoba-pocket-shell-v2` です。画面とスクリプトが別バージョンにならないよう、更新後は同じシェルキャッシュから配信します。新しいキャッシュは、更新取得後に古いタブをすべて閉じ、開き直すと有効になります。
 
 ## 開発者向け：実行・テスト
 
@@ -89,8 +120,11 @@ python3 -m http.server 4173 --bind 127.0.0.1 --directory /workspace
 ```sh
 cd /workspace/ai-translator
 node --check script.js
+node --check model-registry.js
 node --check sw.js
 node tests/browser.cjs
+node tests/workspace.cjs
+node tests/upgrade.cjs
 ```
 
 テストにはNode.js、Playwright、Chromiumが必要です。この環境に既存のものを利用しました。別環境でPlaywrightがなければ、アプリの依存関係を変えずに一時ディレクトリへ導入できます：
@@ -103,3 +137,11 @@ NODE_PATH=/tmp/kotoba-tests/node_modules CHROMIUM_PATH=/usr/bin/chromium node te
 Chromiumが別の場所にある場合は `CHROMIUM_PATH`、テスト用配信先を変える場合は `TEST_BASE_URL` を指定します。
 
 テストは未対応表示、スマートフォン幅、設定保持、画像プレビュー、クリップボード、履歴操作、翻訳失敗、ダウンロード中止、入力変更による結果破棄、PWA・オフラインを検証します。翻訳成功系は**テスト内だけの模擬API**で制御フローを検証し、実際の翻訳モデルの品質を保証しません。iPhone Safari実機、実際の翻訳モデル、GitHub Pages公開後の動作は別途確認が必要です。
+
+### 今回の検証範囲
+
+- `tests/browser.cjs`：既存操作の回帰テスト（13項目）
+- `tests/workspace.cjs`：iPhone相当のモバイル表示、貼り付け失敗・自動翻訳条件、モデル検索・並べ替え、思考量、未接続状態、外部送信なし（8項目）
+- `tests/upgrade.cjs`：公開v1コミット `1d28045` からv2へ更新し、旧Worker待機中の新画面表示、既存IndexedDBと設定の保持、更新後のオフライン表示（3項目）。Git履歴とPython3を使用し、一時ディレクトリだけで実行します。
+
+テストエンジンはChromiumです。WebKitはこの環境のダウンロード先への通信が拒否され、導入できませんでした。**実際のiPhone Safariの表示・クリップボード確認UI・ホーム画面アプリは未検証**です。翻訳成功系はテスト内だけの模擬APIを使い、実モデルの翻訳品質は未検証です。公式API・画像翻訳の実動作は未実装のため検証していません。マージ後のPages配信も利用者による最終確認が必要です。
