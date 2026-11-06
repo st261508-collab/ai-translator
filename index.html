@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#111827">
+  <meta name="description" content="端末で使う、無料の多言語翻訳ワークスペース。対応ブラウザの翻訳機能を使用します。">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" href="./icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="./icons/icon-192.png">
+  <link rel="stylesheet" href="./style.css">
+  <title>ことばポケット | 多言語翻訳</title>
+  <script src="./script.js" defer></script>
+</head>
+<body>
+  <header class="site-header"><a class="brand" href="./"><span class="brand-icon" aria-hidden="true">文</span><span>ことばポケット<small>あなたの言葉を、もっと遠くへ。</small></span></a><button id="theme-toggle" class="icon-button" aria-label="配色を変更">◐</button></header>
+  <main>
+    <section class="intro"><div class="eyebrow">YOUR EVERYDAY LANGUAGE COMPANION</div><h1>世界の言葉を、<br class="mobile-break">あなたの言葉に。</h1><p>コピーして、訳して、また使う。シンプルな翻訳ノート。</p></section>
+    <nav class="tabs" aria-label="メインメニュー">
+      <button class="tab active" data-page="translate" aria-current="page">↔ <span>テキスト</span></button>
+      <button class="tab" data-page="images">▧ <span>画像</span></button>
+      <button class="tab" data-page="history">◷ <span>履歴</span></button>
+      <button class="tab" data-page="models">✧ <span>モデル</span></button>
+    </nav>
+    <section id="page-translate" class="page" aria-label="テキスト翻訳">
+      <div class="toolbar"><div><span class="dot"></span><span id="active-model">Chrome Translator</span><span class="badge">無料・端末内</span></div><button id="open-settings" class="text-button">言語設定 ⚙</button></div>
+      <div id="capability" class="notice" role="status">ブラウザの翻訳機能を確認しています…</div>
+      <div class="editors">
+        <section class="editor"><div class="editor-heading"><label for="source-text">原文 <span id="source-label">自動判定</span></label><button id="paste" class="text-button">貼り付け</button></div><textarea id="source-text" maxlength="5000" placeholder="翻訳したい文章を入力してください。" spellcheck="false"></textarea><div class="editor-footer"><span id="char-count">0 / 5,000</span><button id="clear-text" class="text-button">クリア</button></div></section>
+        <section class="editor result-editor"><div class="editor-heading"><h2>翻訳結果 <span id="target-label">日本語</span></h2><button id="copy" class="text-button" disabled>コピー</button></div><div id="result" class="result" aria-live="polite"><span class="placeholder">ここに翻訳結果が表示されます。</span></div><div class="editor-footer"><span id="result-note">対応ブラウザで翻訳できます</span><span aria-hidden="true">✧</span></div></section>
+      </div>
+      <div class="action-row"><p>入力した文章を外部の翻訳サービスへ送信しません。</p><button id="translate" class="primary">翻訳する <span aria-hidden="true">↗</span></button></div>
+      <div class="privacy-card"><label class="check"><input type="checkbox" id="save-history">翻訳履歴をこの端末に保存する</label><p>初期設定はオフ。オンの場合も、保存するのは翻訳に成功した文章だけです。個人情報・秘密情報を含む文章は入力しないでください。共有端末では保存をオフにしてください。</p><p id="storage-note">履歴はブラウザ内の IndexedDB に保存されます。クラウド同期はありません。</p></div>
+    </section>
+    <section id="page-images" class="page" aria-label="画像翻訳" hidden><div class="section-heading"><div><div class="eyebrow">IMAGE TRANSLATION</div><h2>写真から、言葉をひらく。</h2></div><span class="badge">準備中</span></div><div class="notice">このバージョンは画像の選択・プレビューのみ対応しています。OCR（文字の読み取り）と画像翻訳は未実装です。</div><label class="upload" for="image-file" tabindex="0" role="button" id="choose-image"><span aria-hidden="true">▧</span><strong>画像を選択</strong><span>写真ライブラリやカメラから · JPEG / PNG / WebP · 最大10MB</span></label><input type="file" id="image-file" accept="image/jpeg,image/png,image/webp" hidden><div id="image-preview" hidden><img id="preview" alt="選択した画像のプレビュー"><p id="image-name"></p><button class="secondary" id="remove-image">画像を取り除く</button></div><p class="muted">画像はアップロード・保存されません。将来、端末内OCRを追加できる構成です。</p></section>
+    <section id="page-history" class="page" aria-label="翻訳履歴" hidden><div class="section-heading"><div><div class="eyebrow">YOUR WORD COLLECTION</div><h2>もう一度、使いたい言葉。</h2></div><button id="delete-all" class="text-button danger">すべて削除</button></div><label class="sr-only" for="history-search">履歴を検索</label><input id="history-search" type="search" placeholder="原文・翻訳文から検索" class="search"><div id="history-list"></div><p class="muted">端末のサイトデータを削除すると履歴も消えます。自動バックアップはありません。</p></section>
+    <section id="page-models" class="page" aria-label="翻訳モデル" hidden><div class="section-heading"><div><div class="eyebrow">TRANSLATION ENGINE</div><h2>言葉をつなぐエンジン。</h2></div></div><p class="muted">現在使用できるエンジンは Chrome Translator のみです。お気に入りとピン留めはこの端末に保存します。</p><div id="model-list"></div><div class="notice">APIキー・外部アカウント・有料サービスは不要です。将来のモデルは、導入するまで翻訳には使用できません。</div></section>
+    <footer><span>ことばポケット</span><span>シンプルに。あなたの端末で。</span></footer>
+  </main>
+  <dialog id="settings"><form method="dialog"><div class="section-heading"><h2>言語設定</h2><button class="icon-button" aria-label="設定を閉じる">×</button></div><label for="source-language">原文の言語</label><select id="source-language"></select><p class="muted">自動判定には Language Detector API も必要です。未対応の場合は言語を手動で選んでください。</p><label for="foreign-language">日本語から翻訳する言語</label><select id="foreign-language"></select><div class="notice">外国語 → 日本語<br>日本語 → 選択した外国語</div><button class="primary full" value="save">設定を閉じる</button></form></dialog>
+  <div id="toast" role="status" class="toast" hidden></div>
+</body>
+</html>
