@@ -7,8 +7,8 @@ globalThis.KotobaModels = (() => {
   const reasoningLevels = Object.freeze({auto:'自動',low:'低',standard:'標準',high:'高',max:'最大'});
   const candidate = (id,name,provider) => ({id,name,provider,apiModelId:null,connected:false,reasoning:[],description:'将来の正規API接続候補。公式の提供状況・モデルID・利用条件は未確認です。'});
   const catalog = [
-    {id:'chrome',name:'Chrome Translator',provider:'browser',apiModelId:null,connected:true,reasoning:['auto'],description:'端末内の翻訳機能。ブラウザと言語の対応が必要です。思考量の調整には非対応です。'},
-    {id:'transformers',name:'Transformers.js',provider:'local',apiModelId:null,connected:false,reasoning:[],description:'将来の無料・端末内モデル用の拡張枠。まだ導入していません。'},
+    {id:'chrome',name:'Chrome Translator',provider:'browser',apiModelId:null,connected:typeof globalThis.Translator?.create === 'function',reasoning:[],description:'端末内の翻訳機能。ブラウザと言語の対応が必要です。思考量の調整には非対応です。'},
+    {id:'transformers',name:'OPUS-MT（日英・WASM）',provider:'local',apiModelId:null,connected:LocalTranslation.supported(),reasoning:[],languages:'日本語 ⇔ 英語',description:'Transformers.jsで動く無料の翻訳専用モデル。WebGPU不要。初回に方向ごとのモデル取得が必要です。iPhone実機未検証。'},
     candidate('gpt6-astra','GPT-6 Astra','openai'),
     candidate('gpt6-sol','GPT-6 Sol','openai'),
     candidate('gpt6-terra','GPT-6 Terra','openai'),
@@ -31,8 +31,9 @@ globalThis.KotobaModels = (() => {
     });
   }
   const imageModes = [
-    {id:'ocr-overlay',name:'A：無料OCR＋翻訳文の重ね表示',status:'未実装',kind:'local',pipeline:['detectTextWithBounds','translateText','renderOverlay'],apiModelId:null,connected:false},
+    {id:'ocr-overlay',name:'A：無料OCR＋翻訳文の重ね表示',status:'無料OCR・重ね表示',kind:'local',pipeline:['detectTextWithBounds','translateText','renderOverlay'],apiModelId:null,connected:true},
     {id:'official-image',name:'B：正式APIで自然な画像編集',status:'未接続・利用条件の確認が必要',kind:'official-api',pipeline:['editImageViaOfficialAdapter'],apiModelId:null,connected:false,candidates:['GPT-Image','Nano Banana']}
   ];
-  return {catalog,reasoningLevels,withProviderMetadata,imageModes};
+  const authentication = {chatgpt:{status:'未対応',reason:'正式仕様・対応資格を未確認。WebログインとAPI契約を結び付けません。'}};
+  return {catalog,reasoningLevels,withProviderMetadata,imageModes,authentication};
 })();
